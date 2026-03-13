@@ -199,12 +199,12 @@ class SLlidarNode : public rclcpp::Node
     }
 
     void publish_scan(rclcpp::Publisher<sensor_msgs::msg::LaserScan>::SharedPtr& pub,
-                  sl_lidar_response_measurement_node_hq_t *nodes,
-                  size_t node_count, rclcpp::Time start,
-                  double scan_time, bool inverted,
-                  float angle_min, float angle_max,
-                  float max_distance,
-                  std::string frame_id)
+                    sl_lidar_response_measurement_node_hq_t *nodes,
+                    size_t node_count, rclcpp::Time start,
+                    double scan_time, bool inverted,
+                    float angle_min, float angle_max,
+                    float max_distance,
+                    std::string frame_id)
     {
         static int scan_count = 0;
         auto scan_msg = std::make_shared<sensor_msgs::msg::LaserScan>();
@@ -233,6 +233,7 @@ class SLlidarNode : public rclcpp::Node
         bool reverse_data = (!inverted && reversed) || (inverted && !reversed);
         if (!reverse_data) {
             for (size_t i = 0; i < node_count; i++) {
+                float angle = getAngle(nodes[i]);
                 float read_value = (float) nodes[i].dist_mm_q2/4.0f/1000;
                 if (read_value == 0.0)
                     scan_msg->ranges[i] = std::numeric_limits<float>::infinity();
@@ -242,6 +243,7 @@ class SLlidarNode : public rclcpp::Node
             }
         } else {
             for (size_t i = 0; i < node_count; i++) {
+                float angle = getAngle(nodes[i]);
                 float read_value = (float)nodes[i].dist_mm_q2/4.0f/1000;
                 if (read_value == 0.0)
                     scan_msg->ranges[node_count-1-i] = std::numeric_limits<float>::infinity();
